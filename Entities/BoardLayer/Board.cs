@@ -41,6 +41,18 @@ namespace Chess.Entities.BoardLayer
             piece.Position = pos;
         }
 
+        public Piece RemovePiece(Position pos)
+        {
+            if (GetPiece(pos) == null)
+            {
+                return null;
+            }
+            Piece tmp = GetPiece(pos);
+            tmp.Position = null;
+            Pieces[pos.Row, pos.Column] = null;
+            return tmp;
+        }
+
         public bool ValidPosition(Position pos)
         {
             if (pos.Row < 0 || pos.Row >= Rows || pos.Column < 0 || pos.Column >= Columns)

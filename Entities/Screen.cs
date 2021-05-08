@@ -1,5 +1,6 @@
 using System;
 using Chess.Entities.BoardLayer;
+using Chess.Entities.GameLayer;
 
 namespace Chess.Entities
 {
@@ -24,7 +25,16 @@ namespace Chess.Entities
                 Console.WriteLine();
             }
             Console.WriteLine("  a b c d e f g h");
-        }   
+        }
+
+        public static ChessPosition ReadChessPosition()
+        {
+            string positionString = Console.ReadLine();
+            char column = positionString[0];
+            int row = Int32.Parse(positionString[1].ToString());
+            
+            return new ChessPosition(column, row);
+        }
 
         public static void PrintPiece(Piece piece)
         {
@@ -32,7 +42,8 @@ namespace Chess.Entities
             {
                 Console.Write($"{piece} ");   
             }
-            else {
+            else 
+            {
                 ConsoleColor tmp = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write($"{piece} ");   

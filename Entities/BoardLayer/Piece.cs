@@ -16,5 +16,10 @@ namespace Chess.Entities.BoardLayer
             Color = color;
             NumMoves = 0;
         }
+
+        public void IncrementNumMoves()
+        {
+            NumMoves++;
+        }
     }
 }
