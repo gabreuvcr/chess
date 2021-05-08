@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess.Entities.BoardModel
+namespace Chess.Entities.BoardLayer
 {
     class Board
     {
@@ -18,6 +18,12 @@ namespace Chess.Entities.BoardModel
         public Piece GetPiece(int row, int column)
         {
             return Pieces[row, column];
+        }
+
+        public void InsertPiece(Piece piece, Position pos)
+        {
+            Pieces[pos.Row, pos.Column] = piece;
+            piece.Position = pos;
         }
     }
 }

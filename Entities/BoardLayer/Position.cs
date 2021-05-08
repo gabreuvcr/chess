@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess.Entities.BoardModel
+namespace Chess.Entities.BoardLayer
 {
     class Position
     {

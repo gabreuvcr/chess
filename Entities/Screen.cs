@@ -1,5 +1,5 @@
 using System;
-using Chess.Entities.BoardModel;
+using Chess.Entities.BoardLayer;
 
 namespace Chess.Entities
 {

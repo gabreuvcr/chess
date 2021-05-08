@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess.Entities.BoardModel
+namespace Chess.Entities.BoardLayer
 {
     class Piece
     {
@@ -9,9 +9,9 @@ namespace Chess.Entities.BoardModel
         public int NumMoves { get; protected set; }
         public Board Board { get; protected set; }
 
-        public Piece(Position pos, Board board, Color color)
+        public Piece(Board board, Color color)
         {
-            Position = pos;
+            Position = null;
             Board = board;
             Color = color;
             NumMoves = 0;
