@@ -1,5 +1,5 @@
 ﻿using System;
-using Board;
+using Chess.Entities.Board;
 
 namespace Chess
 {
@@ -7,9 +7,9 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            Position p = new Position(8, 8);
+            Board board = new Board(8, 8);
+            Console.WriteLine(board);
 
-            Console.WriteLine(p);
         }
     }
 }

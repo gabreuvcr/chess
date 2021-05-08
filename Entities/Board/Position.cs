@@ -1,8 +1,8 @@
 using System;
 
-namespace Board
+namespace Chess.Entities.Board
 {
-    public class Position
+    class Position
     {
         public int Row { get; set; }
         public int Column { get; set; }
