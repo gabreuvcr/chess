@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Chess.Entities.BoardLayer;
 using Chess.Entities.GameLayer;
 
@@ -6,6 +7,36 @@ namespace Chess.Entities
 {
     class Screen
     {
+        public static void PrintMatch(Match match)
+        {
+            Screen.PrintBoard(match.Board);
+            PrintCapturedPieces(match);
+            Console.WriteLine($"\nTurn: {match.Turn}");
+            Console.WriteLine($"Awaiting move: {match.CurrentPlayer}");
+        }
+
+        public static void PrintCapturedPieces(Match match)
+        {
+            Console.WriteLine("\nCaptured pieces: ");
+            Console.Write("White: ");
+            PrintPieceSet(match.CapturedPieces(Color.White));
+            Console.Write("Black: ");
+            ConsoleColor tmp = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
+            PrintPieceSet(match.CapturedPieces(Color.Black));
+            Console.ForegroundColor = tmp;
+        }
+
+        public static void PrintPieceSet(HashSet<Piece> pieceSet)
+        {
+            Console.Write("[");
+            foreach (Piece piece in pieceSet)
+            {
+                Console.Write($"{piece} ");
+            }
+            Console.Write("]\n");
+        }
+
         public static void PrintBoard(Board board)
         {
             for (int i = 0; i < board.Rows; i++)

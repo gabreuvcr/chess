@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using Chess.Entities.BoardLayer;
 
 namespace Chess.Entities.GameLayer
@@ -9,6 +9,8 @@ namespace Chess.Entities.GameLayer
         public int Turn { get; private set; }
         public Color CurrentPlayer { get; private set; }
         public bool Finished {get; private set;}
+        private HashSet<Piece> Pieces;
+        private HashSet<Piece> Captured;
 
         public Match()
         {
@@ -16,32 +18,71 @@ namespace Chess.Entities.GameLayer
             Turn = 1;
             CurrentPlayer = Color.White;
             Finished = false;
+            Pieces = new HashSet<Piece>();
+            Captured = new HashSet<Piece>();
             InsertPieces();
         }
 
-        private void InsertPieces()
+        public HashSet<Piece> CapturedPieces(Color color)
         {
-            Board.InsertPiece(new Rook(Board, Color.White), new ChessPosition('c', 1).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.White), new ChessPosition('c', 2).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.White), new ChessPosition('d', 2).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.White), new ChessPosition('e', 2).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.White), new ChessPosition('e', 1).ToPosition());
-            Board.InsertPiece(new King(Board, Color.White), new ChessPosition('d', 1).ToPosition());
+            HashSet<Piece> tmp = new HashSet<Piece>();
+            foreach (Piece piece in Captured)
+            {
+                if (piece.Color == color)
+                {
+                    tmp.Add(piece);
+                }
+            }
+            return tmp;
+        }
 
-            Board.InsertPiece(new Rook(Board, Color.Black), new ChessPosition('c', 7).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.Black), new ChessPosition('c', 8).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.Black), new ChessPosition('d', 7).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.Black), new ChessPosition('e', 7).ToPosition());
-            Board.InsertPiece(new Rook(Board, Color.Black), new ChessPosition('e', 8).ToPosition());
-            Board.InsertPiece(new King(Board, Color.Black), new ChessPosition('d', 8).ToPosition());
+        public HashSet<Piece> PiecesInMatch(Color color)
+        {
+            HashSet<Piece> tmp = new HashSet<Piece>();
+            foreach (Piece piece in Pieces)
+            {
+                if (piece.Color == color)
+                {
+                    tmp.Add(piece);
+                }
+            }
+            tmp.ExceptWith(CapturedPieces(color));
+            return tmp;
+        }
+
+        public void InsertNewPiece(char column, int row, Piece piece)
+        {
+            Board.InsertPiece(piece, new ChessPosition(column, row).ToPosition());
+            Pieces.Add(piece);
+        }
+
+        private void InsertPieces()
+        {   
+            InsertNewPiece('c', 1, new Rook(Board, Color.White));
+            InsertNewPiece('c', 2, new Rook(Board, Color.White));
+            InsertNewPiece('d', 2, new Rook(Board, Color.White));
+            InsertNewPiece('e', 2, new Rook(Board, Color.White));
+            InsertNewPiece('e', 1, new Rook(Board, Color.White));
+            InsertNewPiece('d', 1, new King(Board, Color.White));
+
+            InsertNewPiece('c', 7, new Rook(Board, Color.Black));
+            InsertNewPiece('c', 8, new Rook(Board, Color.Black));
+            InsertNewPiece('d', 7, new Rook(Board, Color.Black));
+            InsertNewPiece('e', 7, new Rook(Board, Color.Black));
+            InsertNewPiece('e', 8, new Rook(Board, Color.Black));
+            InsertNewPiece('d', 8, new King(Board, Color.Black));
         }
 
         public void MakeMovement(Position origin, Position destiny)
         {
             Piece piece = Board.RemovePiece(origin);
+            piece.IncrementNumMoves();
             Piece capturedPiece = Board.RemovePiece(destiny);
             Board.InsertPiece(piece, destiny);
-            piece.IncrementNumMoves();
+            if (capturedPiece != null)
+            {
+                Captured.Add(capturedPiece);
+            }
         }
 
         public void Move(Position origin, Position destiny)
