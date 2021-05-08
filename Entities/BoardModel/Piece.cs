@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess.Entities.Board
+namespace Chess.Entities.BoardModel
 {
     class Piece
     {
@@ -16,6 +16,5 @@ namespace Chess.Entities.Board
             Color = color;
             NumMoves = 0;
         }
-
     }
 }

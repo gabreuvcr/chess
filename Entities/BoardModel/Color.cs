@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess.Entities.Board
+namespace Chess.Entities.BoardModel
 {
     enum Color : int
     {

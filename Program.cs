@@ -1,5 +1,6 @@
 ﻿using System;
-using Chess.Entities.Board;
+using Chess.Entities.BoardModel;
+using Chess.Entities;
 
 namespace Chess
 {
@@ -8,8 +9,8 @@ namespace Chess
         static void Main(string[] args)
         {
             Board board = new Board(8, 8);
-            Console.WriteLine(board);
-
+            
+            Screen.PrintBoard(board);
         }
     }
 }
