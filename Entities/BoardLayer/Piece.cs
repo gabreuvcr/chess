@@ -2,7 +2,7 @@ using System;
 
 namespace Chess.Entities.BoardLayer
 {
-    class Piece
+    abstract class Piece
     {
         public Position Position { get; set; }
         public Color Color { get; protected set; }
@@ -21,5 +21,7 @@ namespace Chess.Entities.BoardLayer
         {
             NumMoves++;
         }
+
+        public abstract bool [,] PossibleMovements();
     }
 }

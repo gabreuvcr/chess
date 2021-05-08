@@ -20,13 +20,17 @@ namespace Chess
 
                     Console.Write("\nOrigem: ");
                     Position origin = Screen.ReadChessPosition().ToPosition();
-                    Console.Write("Destino: ");
+
+                    bool[,] possibleMovements = match.Board.GetPiece(origin).PossibleMovements();
+
+                    Console.Clear();
+                    Screen.PrintBoard(match.Board, possibleMovements);
+
+                    Console.Write("\nDestino: ");
                     Position destiny = Screen.ReadChessPosition().ToPosition();
-                    
+
                     match.Move(origin, destiny);
                 }
-
-               
             }
             catch (BoardException e)
             {
