@@ -219,7 +219,7 @@ namespace Chess.Entities.GameLayer
 
         public void ValidDestinyPosition(Position origin, Position destiny)
         {
-            if (!Board.GetPiece(origin).CanMoveTo(destiny))
+            if (!Board.GetPiece(origin).PossibleMovement(destiny))
             {
                 throw new BoardException("Invalid destiny position");
             }
