@@ -22,6 +22,11 @@ namespace Chess.Entities.BoardLayer
             NumMoves++;
         }
 
+        public void DecrementNumMoves()
+        {
+            NumMoves--;
+        }
+
         public bool ThereArePossibleMovements()
         {
             bool [,] matrix = PossibleMovements();

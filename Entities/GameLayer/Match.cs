@@ -11,6 +11,7 @@ namespace Chess.Entities.GameLayer
         public bool Finished {get; private set;}
         private HashSet<Piece> Pieces;
         private HashSet<Piece> Captured;
+        public bool Check { get; private set; }
 
         public Match()
         {
@@ -18,6 +19,7 @@ namespace Chess.Entities.GameLayer
             Turn = 1;
             CurrentPlayer = Color.White;
             Finished = false;
+            Check = false;
             Pieces = new HashSet<Piece>();
             Captured = new HashSet<Piece>();
             InsertPieces();
@@ -50,6 +52,44 @@ namespace Chess.Entities.GameLayer
             return tmp;
         }
 
+        private Color Adversary(Color color)
+        {
+            return color == Color.White ? Color.Black : Color.White;
+        }
+
+        private Piece KingPiece(Color color)
+        {
+            foreach (Piece piece in PiecesInMatch(color))
+            {
+                if (piece is King)
+                {
+                    return piece;
+                }
+            }
+
+            return null;
+        }
+
+        private bool isCheck(Color color)
+        {
+            Piece king = KingPiece(color);
+            if (king == null)
+            {
+                throw new BoardException($"There is no king of {color} color on the board");
+            }
+
+            foreach (Piece piece in PiecesInMatch(Adversary(color)))
+            {
+                bool[,] matrix = piece.PossibleMovements();
+                if (matrix[king.Position.Row, king.Position.Column])
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void InsertNewPiece(char column, int row, Piece piece)
         {
             Board.InsertPiece(piece, new ChessPosition(column, row).ToPosition());
@@ -73,7 +113,7 @@ namespace Chess.Entities.GameLayer
             InsertNewPiece('d', 8, new King(Board, Color.Black));
         }
 
-        public void MakeMovement(Position origin, Position destiny)
+        public Piece MakeMovement(Position origin, Position destiny)
         {
             Piece piece = Board.RemovePiece(origin);
             piece.IncrementNumMoves();
@@ -83,11 +123,35 @@ namespace Chess.Entities.GameLayer
             {
                 Captured.Add(capturedPiece);
             }
+
+            return capturedPiece;
+        }
+
+        public void UndoMovement(Position origin, Position destiny, Piece capturedPiece)
+        {
+            Piece piece = Board.RemovePiece(destiny);
+            piece.DecrementNumMoves();
+            
+            if (capturedPiece != null)
+            {
+                Board.InsertPiece(capturedPiece, destiny);
+                Captured.Remove(capturedPiece);
+            }
+            Board.InsertPiece(piece, origin);
         }
 
         public void Move(Position origin, Position destiny)
         {
-            MakeMovement(origin, destiny);
+            Piece capturedPiece = MakeMovement(origin, destiny);
+
+            if (isCheck(CurrentPlayer))
+            {
+                UndoMovement(origin, destiny, capturedPiece);
+                throw new BoardException("You cannot put yourself in check");
+            }
+
+            Check = isCheck(Adversary(CurrentPlayer));
+
             Turn++;
             CurrentPlayer = CurrentPlayer == Color.White ? Color.Black : Color.White;
         }

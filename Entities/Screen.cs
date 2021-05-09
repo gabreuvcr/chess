@@ -13,6 +13,10 @@ namespace Chess.Entities
             PrintCapturedPieces(match);
             Console.WriteLine($"\nTurn: {match.Turn}");
             Console.WriteLine($"Awaiting move: {match.CurrentPlayer}");
+            if (match.Check)
+            {
+                Console.WriteLine("CHECK!");
+            }
         }
 
         public static void PrintCapturedPieces(Match match)
@@ -79,7 +83,7 @@ namespace Chess.Entities
 
         public static ChessPosition ReadChessPosition()
         {
-            string positionString = Console.ReadLine();
+            string positionString = Console.ReadLine().Trim().ToLower();
             char column = positionString[0];
             int row = Int32.Parse(positionString[1].ToString());
             
