@@ -12,10 +12,18 @@ namespace Chess.Entities
             Screen.PrintBoard(match.Board);
             PrintCapturedPieces(match);
             Console.WriteLine($"\nTurn: {match.Turn}");
-            Console.WriteLine($"Awaiting move: {match.CurrentPlayer}");
-            if (match.Check)
+            if (!match.Finished)
             {
-                Console.WriteLine("CHECK!");
+                Console.WriteLine($"Awaiting move: {match.CurrentPlayer}");
+                if (match.Check)
+                {
+                    Console.WriteLine("CHECK!");
+                }
+            }
+            else 
+            {
+                Console.WriteLine("CHECKMATE!");
+                Console.WriteLine($"Winner: {match.CurrentPlayer}");
             }
         }
 

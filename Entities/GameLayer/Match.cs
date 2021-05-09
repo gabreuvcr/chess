@@ -70,7 +70,7 @@ namespace Chess.Entities.GameLayer
             return null;
         }
 
-        private bool isCheck(Color color)
+        private bool IsCheck(Color color)
         {
             Piece king = KingPiece(color);
             if (king == null)
@@ -90,6 +90,38 @@ namespace Chess.Entities.GameLayer
             return false;
         }
 
+        public bool IsCheckMate(Color color)
+        {
+            if (!IsCheck(color))
+            {
+                return false;
+            }
+
+            foreach (Piece piece in PiecesInMatch(color))
+            {
+                bool[,] matrix = piece.PossibleMovements();
+                for (int i  = 0; i < Board.Rows; i++) {
+                    for (int j = 0; j < Board.Columns; j++)
+                    {
+                        if (matrix[i, j])
+                        {
+                            Position origin = piece.Position;
+                            Position destiny = new Position(i, j);
+                            Piece capturedPiece = MakeMovement(origin, destiny);
+                            bool testIsCheck = IsCheck(color);
+                            UndoMovement(origin, destiny, capturedPiece);
+                            if (!testIsCheck)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        }
+
         public void InsertNewPiece(char column, int row, Piece piece)
         {
             Board.InsertPiece(piece, new ChessPosition(column, row).ToPosition());
@@ -98,19 +130,25 @@ namespace Chess.Entities.GameLayer
 
         private void InsertPieces()
         {   
-            InsertNewPiece('c', 1, new Rook(Board, Color.White));
-            InsertNewPiece('c', 2, new Rook(Board, Color.White));
-            InsertNewPiece('d', 2, new Rook(Board, Color.White));
-            InsertNewPiece('e', 2, new Rook(Board, Color.White));
-            InsertNewPiece('e', 1, new Rook(Board, Color.White));
-            InsertNewPiece('d', 1, new King(Board, Color.White));
+            // InsertNewPiece('c', 1, new Rook(Board, Color.White));
+            // InsertNewPiece('c', 2, new Rook(Board, Color.White));
+            // InsertNewPiece('d', 2, new Rook(Board, Color.White));
+            // InsertNewPiece('e', 2, new Rook(Board, Color.White));
+            // InsertNewPiece('e', 1, new Rook(Board, Color.White));
+            // InsertNewPiece('d', 1, new King(Board, Color.White));
 
-            InsertNewPiece('c', 7, new Rook(Board, Color.Black));
-            InsertNewPiece('c', 8, new Rook(Board, Color.Black));
-            InsertNewPiece('d', 7, new Rook(Board, Color.Black));
-            InsertNewPiece('e', 7, new Rook(Board, Color.Black));
-            InsertNewPiece('e', 8, new Rook(Board, Color.Black));
-            InsertNewPiece('d', 8, new King(Board, Color.Black));
+            // InsertNewPiece('c', 7, new Rook(Board, Color.Black));
+            // InsertNewPiece('c', 8, new Rook(Board, Color.Black));
+            // InsertNewPiece('d', 7, new Rook(Board, Color.Black));
+            // InsertNewPiece('e', 7, new Rook(Board, Color.Black));
+            // InsertNewPiece('e', 8, new Rook(Board, Color.Black));
+            // InsertNewPiece('d', 8, new King(Board, Color.Black));
+            InsertNewPiece('c', 1, new Rook(Board, Color.White));
+            InsertNewPiece('d', 1, new King(Board, Color.White));
+            InsertNewPiece('h', 7, new Rook(Board, Color.White));
+
+            InsertNewPiece('a', 8, new King(Board, Color.Black));
+            InsertNewPiece('b', 8, new Rook(Board, Color.Black));
         }
 
         public Piece MakeMovement(Position origin, Position destiny)
@@ -144,16 +182,23 @@ namespace Chess.Entities.GameLayer
         {
             Piece capturedPiece = MakeMovement(origin, destiny);
 
-            if (isCheck(CurrentPlayer))
+            if (IsCheck(CurrentPlayer))
             {
                 UndoMovement(origin, destiny, capturedPiece);
                 throw new BoardException("You cannot put yourself in check");
             }
 
-            Check = isCheck(Adversary(CurrentPlayer));
+            Check = IsCheck(Adversary(CurrentPlayer));
 
-            Turn++;
-            CurrentPlayer = CurrentPlayer == Color.White ? Color.Black : Color.White;
+            if (IsCheckMate(Adversary(CurrentPlayer)))
+            {
+                Finished = true;
+            }
+            else
+            {
+                Turn++;
+                CurrentPlayer = CurrentPlayer == Color.White ? Color.Black : Color.White;
+            }
         }
 
         public void ValidOriginPosition(Position pos)
