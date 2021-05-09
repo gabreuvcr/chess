@@ -134,7 +134,7 @@ namespace Chess.Entities.GameLayer
             InsertNewPiece('b', 1, new Knight(Board, Color.White));
             InsertNewPiece('c', 1, new Bishop(Board, Color.White));
             InsertNewPiece('d', 1, new Queen(Board, Color.White));
-            InsertNewPiece('e', 1, new King(Board, Color.White));
+            InsertNewPiece('e', 1, new King(Board, Color.White, this));
             InsertNewPiece('f', 1, new Bishop(Board, Color.White));
             InsertNewPiece('g', 1, new Knight(Board, Color.White));
             InsertNewPiece('h', 1, new Rook(Board, Color.White));
@@ -151,7 +151,7 @@ namespace Chess.Entities.GameLayer
             InsertNewPiece('b', 8, new Knight(Board, Color.Black));
             InsertNewPiece('c', 8, new Bishop(Board, Color.Black));
             InsertNewPiece('d', 8, new Queen(Board, Color.Black));
-            InsertNewPiece('e', 8, new King(Board, Color.Black));
+            InsertNewPiece('e', 8, new King(Board, Color.Black, this));
             InsertNewPiece('f', 8, new Bishop(Board, Color.Black));
             InsertNewPiece('g', 8, new Knight(Board, Color.Black));
             InsertNewPiece('h', 8, new Rook(Board, Color.Black));
@@ -176,6 +176,25 @@ namespace Chess.Entities.GameLayer
                 Captured.Add(capturedPiece);
             }
 
+            //Castling
+            if (piece is King && destiny.Column == origin.Column + 2)
+            {
+                 Position originRook = new Position(origin.Row, origin.Column + 3);
+                 Position destinyRook = new Position(origin.Row, origin.Column + 1);
+                 Piece rook = Board.RemovePiece(originRook);
+                 rook.IncrementNumMoves();
+                 Board.InsertPiece(rook, destinyRook);
+            }
+            //Castling
+            if (piece is King && destiny.Column == origin.Column - 2)
+            {
+                 Position originRook = new Position(origin.Row, origin.Column - 4);
+                 Position destinyRook = new Position(origin.Row, origin.Column - 1);
+                 Piece rook = Board.RemovePiece(originRook);
+                 rook.IncrementNumMoves();
+                 Board.InsertPiece(rook, destinyRook);
+            }
+
             return capturedPiece;
         }
 
@@ -190,6 +209,25 @@ namespace Chess.Entities.GameLayer
                 Captured.Remove(capturedPiece);
             }
             Board.InsertPiece(piece, origin);
+
+            //Castling
+            if (piece is King && destiny.Column == origin.Column + 2)
+            {
+                 Position originRook = new Position(origin.Row, origin.Column + 3);
+                 Position destinyRook = new Position(origin.Row, origin.Column + 1);
+                 Piece rook = Board.RemovePiece(destinyRook);
+                 rook.DecrementNumMoves();
+                 Board.InsertPiece(rook, originRook);
+            }
+            //Castling
+            if (piece is King && destiny.Column == origin.Column - 2)
+            {
+                 Position originRook = new Position(origin.Row, origin.Column - 4);
+                 Position destinyRook = new Position(origin.Row, origin.Column - 1);
+                 Piece rook = Board.RemovePiece(destinyRook);
+                 rook.DecrementNumMoves();
+                 Board.InsertPiece(rook, originRook);
+            }
         }
 
         public void Move(Position origin, Position destiny)
