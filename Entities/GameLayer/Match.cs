@@ -12,6 +12,7 @@ namespace Chess.Entities.GameLayer
         private HashSet<Piece> Pieces;
         private HashSet<Piece> Captured;
         public bool Check { get; private set; }
+        public Piece VulnerableEnpassant { get; private set; }
 
         public Match()
         {
@@ -20,6 +21,7 @@ namespace Chess.Entities.GameLayer
             CurrentPlayer = Color.White;
             Finished = false;
             Check = false;
+            VulnerableEnpassant = null;
             Pieces = new HashSet<Piece>();
             Captured = new HashSet<Piece>();
             InsertPieces();
@@ -138,14 +140,14 @@ namespace Chess.Entities.GameLayer
             InsertNewPiece('f', 1, new Bishop(Board, Color.White));
             InsertNewPiece('g', 1, new Knight(Board, Color.White));
             InsertNewPiece('h', 1, new Rook(Board, Color.White));
-            InsertNewPiece('a', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('b', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('c', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('d', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('e', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('f', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('g', 2, new Pawn(Board, Color.White));
-            InsertNewPiece('h', 2, new Pawn(Board, Color.White));
+            InsertNewPiece('a', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('b', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('c', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('d', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('e', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('f', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('g', 2, new Pawn(Board, Color.White, this));
+            InsertNewPiece('h', 2, new Pawn(Board, Color.White, this));
 
             InsertNewPiece('a', 8, new Rook(Board, Color.Black));
             InsertNewPiece('b', 8, new Knight(Board, Color.Black));
@@ -155,14 +157,14 @@ namespace Chess.Entities.GameLayer
             InsertNewPiece('f', 8, new Bishop(Board, Color.Black));
             InsertNewPiece('g', 8, new Knight(Board, Color.Black));
             InsertNewPiece('h', 8, new Rook(Board, Color.Black));
-            InsertNewPiece('a', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('b', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('c', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('d', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('e', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('f', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('g', 7, new Pawn(Board, Color.Black));
-            InsertNewPiece('h', 7, new Pawn(Board, Color.Black));
+            InsertNewPiece('a', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('b', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('c', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('d', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('e', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('f', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('g', 7, new Pawn(Board, Color.Black, this));
+            InsertNewPiece('h', 7, new Pawn(Board, Color.Black, this));
         }
 
         public Piece MakeMovement(Position origin, Position destiny)
@@ -193,6 +195,25 @@ namespace Chess.Entities.GameLayer
                  Piece rook = Board.RemovePiece(originRook);
                  rook.IncrementNumMoves();
                  Board.InsertPiece(rook, destinyRook);
+            }
+
+            //En Passant
+            if (piece is Pawn)
+            {
+                if (origin.Column != destiny.Column && capturedPiece == null)
+                {
+                    Position positionPawn;
+                    if (piece.Color == Color.White)
+                    {
+                        positionPawn = new Position(destiny.Row + 1, destiny.Column);
+                    }
+                    else
+                    {
+                        positionPawn = new Position(destiny.Row - 1, destiny.Column);
+                    }
+                    capturedPiece = Board.RemovePiece(positionPawn);
+                    Captured.Add(capturedPiece);
+                }
             }
 
             return capturedPiece;
@@ -228,6 +249,25 @@ namespace Chess.Entities.GameLayer
                  rook.DecrementNumMoves();
                  Board.InsertPiece(rook, originRook);
             }
+
+            //En Passant
+            if (piece is Pawn)
+            {
+                if (origin.Column != destiny.Column && capturedPiece == VulnerableEnpassant)
+                {
+                    Piece pawn  = Board.RemovePiece(destiny);
+                    Position posPawn;
+                    if (piece.Color == Color.White)
+                    {
+                        posPawn = new Position(3, destiny.Column);
+                    }
+                    else
+                    {
+                        posPawn = new Position(4, destiny.Column);
+                    }
+                    Board.InsertPiece(pawn, posPawn);
+                }
+            }
         }
 
         public void Move(Position origin, Position destiny)
@@ -250,6 +290,17 @@ namespace Chess.Entities.GameLayer
             {
                 Turn++;
                 CurrentPlayer = CurrentPlayer == Color.White ? Color.Black : Color.White;
+            }
+            
+            //En Passant
+            Piece piece = Board.GetPiece(destiny);
+            if (piece is Pawn && (destiny.Row == origin.Row - 2 || destiny.Row == origin.Row + 2))
+            {
+                VulnerableEnpassant = piece;
+            }
+            else
+            {
+                VulnerableEnpassant = null;
             }
         }
 
