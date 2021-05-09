@@ -280,6 +280,23 @@ namespace Chess.Entities.GameLayer
                 throw new BoardException("You cannot put yourself in check");
             }
 
+            Piece piece = Board.GetPiece(destiny);
+
+            //Promotion
+            if (piece is Pawn)
+            {
+                if ((piece.Color == Color.White && destiny.Row == 0) ||
+                    (piece.Color == Color.Black && destiny.Row == 7))
+                {
+                    piece = Board.RemovePiece(destiny);
+                    Pieces.Remove(piece);
+                    Piece queen = new Queen(Board, piece.Color);
+                    Board.InsertPiece(queen, destiny);
+                    Pieces.Add(queen);
+                }
+            }
+
+
             Check = IsCheck(Adversary(CurrentPlayer));
 
             if (IsCheckMate(Adversary(CurrentPlayer)))
@@ -293,7 +310,6 @@ namespace Chess.Entities.GameLayer
             }
             
             //En Passant
-            Piece piece = Board.GetPiece(destiny);
             if (piece is Pawn && (destiny.Row == origin.Row - 2 || destiny.Row == origin.Row + 2))
             {
                 VulnerableEnpassant = piece;
